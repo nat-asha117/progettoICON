@@ -4,6 +4,7 @@
 
 # Main libraries
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 import pandas as pd
 import sys
@@ -105,12 +106,15 @@ if __name__ == '__main__':
     # DATASET OPTIMIZATION:
 
     # Deleting unused and/or irrelevant columns
-    df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral",
-                        "waist(cm)"], axis=1)
+    df_smoke = df.drop(["ID"], axis=1)
 
     # String to full conversion + dataframe cleaning
     df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
     df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
+    df_smoke["oral"] = df_smoke["oral"].replace("N", 0)
+    df_smoke["oral"] = df_smoke["oral"].replace("Y", 1)
+    df_smoke["gender"] = df_smoke["gender"].replace("M", 0)
+    df_smoke["gender"] = df_smoke["gender"].replace("F", 1)
 
     # Data overview
     print("\nDisplay (partial) of the dataframe:\n", df_smoke.head())
@@ -367,6 +371,18 @@ if __name__ == '__main__':
     # Creation of the network
     bNet = BayesianNetwork(k2_model.edges())
     bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
+
+    # Graph of nodes
+
+    G = nx.MultiDiGraph()
+    G.add_edges_from(k2_model.edges())
+    pos = nx.spring_layout(G, iterations=20)
+    nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'),
+                           node_size=175)
+    nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="baseline")
+    nx.draw_networkx_edges(G, pos, arrows=True, edge_color="r")
+    plt.title("BAYESIAN NETWORK GRAPH")
+    plt.show()
 
     # Information about bNet
 
