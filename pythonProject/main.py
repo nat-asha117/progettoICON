@@ -14,7 +14,7 @@ import multiprocessing
 # Classification models
 from pgmpy.estimators import K2Score, HillClimbSearch, MaximumLikelihoodEstimator
 from pgmpy.inference import VariableElimination
-from pgmpy.models import BayesianNetwork
+from pgmpy.models import BayesianNetwork, NaiveBayes
 
 # Machine learning
 from sklearn import metrics
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         df = pd.read_csv(sys.argv[1])
     else:
-        df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+        df = pd.read_csv("C:\\Users\\verio\\repo\\progettoICON\\pythonProject\\smoking.csv")
 
 
 
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     plt.show()
 
     # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
-
+"""
     # Creation of X feature and target y
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
@@ -350,171 +350,171 @@ if __name__ == '__main__':
     plt.title("Top features derived by Random Forest")
     plt.ylabel("")
     plt.show()
+"""
+# CREATION OF THE BAYESIAN NETWORK
 
-    # CREATION OF THE BAYESIAN NETWORK
+prYellow("\n\t\tCreation of the Bayesian Network\n")
 
-    prYellow("\n\t\tCreation of the Bayesian Network\n")
+# Converting all values within the dataframe to integers
+df_smoke_int = np.array(df_smoke, dtype=int)
+df_smoke = pd.DataFrame(df_smoke_int, columns=df_smoke.columns)
 
-    # Converting all values within the dataframe to integers
-    df_smoke_int = np.array(df_smoke, dtype=int)
-    df_smoke = pd.DataFrame(df_smoke_int, columns=df_smoke.columns)
+# Creation of X feature and target y
+X_train = df_smoke
+y_train = df_smoke["smoking"]
 
-    # Creation of X feature and target y
-    X_train = df_smoke
-    y_train = df_smoke["smoking"]
+# Creation of the network structure
+k2 = K2Score(X_train)
+hc_k2 = HillClimbSearch(X_train)
+k2_model = hc_k2.estimate(scoring_method=k2)
 
-    # Creation of the network structure
-    k2 = K2Score(X_train)
-    hc_k2 = HillClimbSearch(X_train)
-    k2_model = hc_k2.estimate(scoring_method=k2)
+# Creation of the network
+bNet = NaiveBayes(k2_model.edges())
+bNet.fit(df_smoke, "smoking", estimator=MaximumLikelihoodEstimator)
 
-    # Creation of the network
-    bNet = BayesianNetwork(k2_model.edges())
-    bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
+# Graph of nodes
 
-    # Graph of nodes
+G = nx.MultiDiGraph()
+G.add_edges_from(bNet.edges)
+pos = nx.spring_layout(G, iterations=20)
+nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'),
+                       node_size=175)
+nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="baseline")
+nx.draw_networkx_edges(G, pos, arrows=True, edge_color="r")
+plt.title("BAYESIAN NETWORK GRAPH")
+plt.show()
 
-    G = nx.MultiDiGraph()
-    G.add_edges_from(k2_model.edges())
-    pos = nx.spring_layout(G, iterations=20)
-    nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'),
-                           node_size=175)
-    nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="baseline")
-    nx.draw_networkx_edges(G, pos, arrows=True, edge_color="r")
-    plt.title("BAYESIAN NETWORK GRAPH")
-    plt.show()
+# Information about bNet
 
-    # Information about bNet
+prYellow("\nMarkov blanket for \"smoking\"")
+print(bNet.get_markov_blanket('smoking'), "\n")
 
-    prYellow("\nMarkov blanket for \"smoking\"")
-    print(bNet.get_markov_blanket('smoking'), "\n")
+# CALCULATION OF THE PROBABILITY
+#  calculation for a supposed non-smoker (0) and a smoker (1)
 
-    # CALCULATION OF THE PROBABILITY
-    #  calculation for a supposed non-smoker (0) and a smoker (1)
+# Elimination of irrelevant variables
+data = VariableElimination(bNet)  # inference
 
-    # Elimination of irrelevant variables
-    data = VariableElimination(bNet)  # inference
+# Display of edges and arcs
+print('\033[1m' + '\nNodes:\n' + '\033[0m', bNet.nodes)
+print('\033[1m' + '\nEdges:\n' + '\033[0m', bNet.edges)
 
-    # Display of edges and arcs
-    print('\033[1m' + '\nNodes:\n' + '\033[0m', bNet.nodes)
-    print('\033[1m' + '\nEdges:\n' + '\033[0m', bNet.edges)
+# Potential non-smoker subject
+prGreen("Tests carried out on an average person with values:")
+print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
+notSmoker = data.query(show_progress=False, variables=['smoking'],
+                       evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113,
+                                 'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 0})
 
-    # Potential non-smoker subject
-    prGreen("Tests carried out on an average person with values:")
-    print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
-    notSmoker = data.query(show_progress=False, variables=['smoking'],
-                           evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113,
-                                     'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 0})
+prGreen('\nProbability for a potentially non-smoker:')
+print(notSmoker, '\n')
 
-    prGreen('\nProbability for a potentially non-smoker:')
-    print(notSmoker, '\n')
+# Test on Potentially non-smoker subject
+TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
+                           evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
+                                     'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 1})
 
-    # Test on Potentially non-smoker subject
-    TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
-                               evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
-                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 1})
+prGreen('\nTest on Potentially non-smoker subject:')
+print(TestNotSmoker, '\n')
 
-    prGreen('\nTest on Potentially non-smoker subject:')
-    print(TestNotSmoker, '\n')
+# Potential smoker
+smoker = data.query(show_progress=False, variables=['smoking'],
+                    evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'HDL': 50,
+                              'hemoglobin': 18, 'serum creatinine': 5, 'dental caries': 1, 'tartar': 1})
 
-    # Potential smoker
-    smoker = data.query(show_progress=False, variables=['smoking'],
-                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'HDL': 50,
-                                  'hemoglobin': 18, 'serum creatinine': 5, 'dental caries': 1, 'tartar': 1})
+prRed('\nProbability for a potential smoker:')
+print(smoker)
 
-    prRed('\nProbability for a potential smoker:')
-    print(smoker)
+# Test on subject potentially smoker
+TestSmoker = data.query(show_progress=False, variables=['smoking'],
+                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 18, 'triglyceride': 151,
+                                  'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 0, 'dental caries': 1, 'tartar': 1})
 
-    # Test on subject potentially smoker
-    TestSmoker = data.query(show_progress=False, variables=['smoking'],
-                            evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 18, 'triglyceride': 151,
-                                      'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 0, 'dental caries': 1, 'tartar': 1})
+prRed('\nTest on Subject potentially smoker:')
+print(TestSmoker, '\n')
 
-    prRed('\nTest on Subject potentially smoker:')
-    print(TestSmoker, '\n')
+prYellow("\n\n\t\t\t\t\tWelcome to our system!\n\n\t"
+         "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
 
-    prYellow("\n\n\t\t\t\t\tWelcome to our system!\n\n\t"
-             "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
-
-    #
-    while True:
-        i = 0
-        try:
-            prYellow("Do you want to enter your data for a prediction? - Y/N? - (Typing 'n' close program)")
-            result = str(input())
-            if 'N' == result or result == 'n':
-                exit(1)
-            elif 'Y' == result or result == 'y':
-                prYellow("Please insert: ")
-                columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "HDL",
-                           "hemoglobin", "serum creatinine", "dental caries", "tartar"]
-                print(columns)
-                prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
-                value = [None] * len(columns)
-                while i < len(columns):
-                    if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
-                        prRed("The range of allowed values are multiples of 5")
-                        print("The minimum acceptable \"", columns[i], "\"value is:", df_smoke[columns[i]].min(),
-                              "The maximum is:", df_smoke[columns[i]].max())
-                        print("Insert ", columns[i], " value: ")
-                    elif columns[i] != "tartar" and columns[i] != "dental caries":
-                        print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
+#
+while True:
+    i = 0
+    try:
+        prYellow("Do you want to enter your data for a prediction? - Y/N? - (Typing 'n' close program)")
+        result = str(input())
+        if 'N' == result or result == 'n':
+            exit(1)
+        elif 'Y' == result or result == 'y':
+            prYellow("Please insert: ")
+            columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "HDL",
+                       "hemoglobin", "serum creatinine", "dental caries", "tartar"]
+            print(columns)
+            prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
+            value = [None] * len(columns)
+            while i < len(columns):
+                if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
+                    prRed("The range of allowed values are multiples of 5")
+                    print("The minimum acceptable \"", columns[i], "\"value is:", df_smoke[columns[i]].min(),
+                          "The maximum is:", df_smoke[columns[i]].max())
+                    print("Insert ", columns[i], " value: ")
+                elif columns[i] != "tartar" and columns[i] != "dental caries":
+                    print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
+                else:
+                    print("Insert ", columns[i], " value (0 = No, 1 = Yes, -1 = Data not available): ")
+                value[i] = int(input())
+                if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
+                    if value[i] <= 0:
+                        prRed("Insert value >= 0")
+                    elif value[i] < df_smoke[columns[i]].min():
+                        prRed("Error! You entered too small value!")
+                    elif value[i] > df_smoke[columns[i]].max():
+                        prRed("Error! You entered too large value!")
+                    elif value[i] % 5 != 0:
+                        prRed("Error! You have not entered a multiple of 5")
                     else:
-                        print("Insert ", columns[i], " value (0 = No, 1 = Yes, -1 = Data not available): ")
-                    value[i] = int(input())
-                    if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
-                        if value[i] <= 0:
-                            prRed("Insert value >= 0")
-                        elif value[i] < df_smoke[columns[i]].min():
-                            prRed("Error! You entered too small value!")
-                        elif value[i] > df_smoke[columns[i]].max():
-                            prRed("Error! You entered too large value!")
-                        elif value[i] % 5 != 0:
-                            prRed("Error! You have not entered a multiple of 5")
-                        else:
-                            i = i + 1
-                    else:
-                        if value[i] == -1 and ():
-                            prRed("Insert value >= 0")
-                        elif value[i] <= -2:
-                            prRed("Insert value >= 0")
-                        elif (columns[i] == "tartar") and (value[i] > 1):
-                            prRed("Error! Insert value (0 = No, 1 = Yes): ")
-                        elif (columns[i] == "dental caries") and (value[i] > 1):
-                            prRed("Error! Insert value (0 = No, 1 = Yes): ")
-                        else:
-                            i = i + 1
-                try:
-                    i = 0
-                    dataAvailable = {}
-                    while i < len(columns):
-                        if value[i] != -1:
-                            dataAvailable[columns[i]] = value[i]
                         i = i + 1
-                    UserInput = data.query(show_progress=False, variables=['smoking'],
-                                           evidence=dataAvailable)
-                    print(UserInput)
-                    if UserInput.values[0] <= 0.50:
-                        prYellow("Want to know what values to improve not to be to no longer be considered a smoker?"
-                                 " - Y/N")
-                        result = str(input())
-                        if 'Y' == result or result == 'y':
-                            waitTime = float(60)
-                            prYellowMoreString("The search will last", waitTime, "seconds. If no ideal combinations "
-                                                                                 "are found, no data will be "
-                                                                                 "displayed.")
-                            event = multiprocessing.Event()
-                            t = multiprocessing.Process(target=simulationThread, args=(bNet, value, data, event))
-                            t.start()
-                            if not event.wait(waitTime):
-                                prRed("Error! No data find.")
-                            event.clear()
-                            t.terminate()
-                except IndexError as e:
-                    prRed("Error!")
-                    print("You are insert:  ", value)
-                    print(e.args)
-            else:
-                print("Wrong input. Write Y or N")
-        except ValueError:
-            print("Wrong input")
+                else:
+                    if value[i] == -1 and ():
+                        prRed("Insert value >= 0")
+                    elif value[i] <= -2:
+                        prRed("Insert value >= 0")
+                    elif (columns[i] == "tartar") and (value[i] > 1):
+                        prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                    elif (columns[i] == "dental caries") and (value[i] > 1):
+                        prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                    else:
+                        i = i + 1
+            try:
+                i = 0
+                dataAvailable = {}
+                while i < len(columns):
+                    if value[i] != -1:
+                        dataAvailable[columns[i]] = value[i]
+                    i = i + 1
+                UserInput = data.query(show_progress=False, variables=['smoking'],
+                                       evidence=dataAvailable)
+                print(UserInput)
+                if UserInput.values[0] <= 0.50:
+                    prYellow("Want to know what values to improve not to be to no longer be considered a smoker?"
+                             " - Y/N")
+                    result = str(input())
+                    if 'Y' == result or result == 'y':
+                        waitTime = float(60)
+                        prYellowMoreString("The search will last", waitTime, "seconds. If no ideal combinations "
+                                                                             "are found, no data will be "
+                                                                             "displayed.")
+                        event = multiprocessing.Event()
+                        t = multiprocessing.Process(target=simulationThread, args=(bNet, value, data, event))
+                        t.start()
+                        if not event.wait(waitTime):
+                            prRed("Error! No data find.")
+                        event.clear()
+                        t.terminate()
+            except IndexError as e:
+                prRed("Error!")
+                print("You are insert:  ", value)
+                print(e.args)
+        else:
+            print("Wrong input. Write Y or N")
+    except ValueError:
+        print("Wrong input")
