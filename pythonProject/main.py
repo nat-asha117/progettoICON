@@ -99,7 +99,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         df = pd.read_csv(sys.argv[1])
     else:
-        df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+        df = pd.read_csv("C:\\Users\\verio\\repo\\progettoICON\\pythonProject\\smoking.csv")
 
 
 
