@@ -161,12 +161,12 @@ if __name__ == '__main__':
     plt.show()
 
     # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
-"""
+
     # Creation of X feature and target y
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-    kf = RepeatedKFold(n_splits=5, n_repeats=5)
+    kf = RepeatedKFold(n_splits=5, n_repeats=1)
 
     # Classifiers for the purpose of evaluation
     knn = KNeighborsClassifier()
@@ -350,7 +350,7 @@ if __name__ == '__main__':
     plt.title("Top features derived by Random Forest")
     plt.ylabel("")
     plt.show()
-"""
+
 # CREATION OF THE BAYESIAN NETWORK
 
 prYellow("\n\t\tCreation of the Bayesian Network\n")
@@ -386,14 +386,12 @@ plt.show()
 
 # Information about bNet
 
-prYellow("\nMarkov blanket for \"smoking\"")
-print(bNet.get_markov_blanket('smoking'), "\n")
-
 # CALCULATION OF THE PROBABILITY
 #  calculation for a supposed non-smoker (0) and a smoker (1)
 
 # Elimination of irrelevant variables
 data = VariableElimination(bNet)  # inference
+print(bNet.get_cpds())
 
 # Display of edges and arcs
 print('\033[1m' + '\nNodes:\n' + '\033[0m', bNet.nodes)
