@@ -40,18 +40,18 @@ def simulationThread(bNet, value, data, evemt):
                                  evidence={'smoking': 0, 'age': value[0],
                                            'height(cm)': value[1],
                                            'weight(kg)': value[2]})
-        newValue = newValue.drop(["Cholesterol", "smoking", "LDL", "systolic", "relaxation"], axis=1)
+        newValue = newValue.drop(["Cholesterol", "smoking", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
         UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
                                       evidence={'age': newValue.get("age")[0],
                                                 'height(cm)': newValue.get("height(cm)")[0],
                                                 'weight(kg)': newValue.get("weight(kg)")[0],
-                                                'Gtp': newValue.get("Gtp")[0],
+                                                'gender': newValue.get("gender")[0],
                                                 'triglyceride': newValue.get("triglyceride")[0],
-                                                'HDL': newValue.get("HDL")[0],
-                                                'hemoglobin': newValue.get("hemoglobin")[0],
                                                 'serum creatinine': newValue.get("serum creatinine")[0],
                                                 "dental caries": newValue.get("dental caries")[0],
-                                                'tartar': newValue.get("tartar")[0]})
+                                                'tartar': newValue.get("tartar")[0],
+                                                'hearing(left)': newValue.get("hearing(left)"[0]),
+                                                'hearing(right)': newValue.get("hearing(right)"[0])})
         if UserInputUpdated.values[0] > 0.50:
             time.sleep(1)
             prYellow("Suggested values:")
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-    kf = RepeatedKFold(n_splits=5, n_repeats=1)
+    kf = RepeatedKFold(n_splits=5, n_repeats=5)
 
     # Classifiers for the purpose of evaluation
     knn = KNeighborsClassifier()
@@ -484,19 +484,23 @@ if __name__ == '__main__':
                 exit(1)
             elif 'Y' == result or result == 'y':
                 prYellow("Please insert: ")
-                columns = ["age", "height(cm)", "weight(kg)", "hearing(left)", "hearing(right)", "triglyceride",
-                           "dental caries", "tartar", "gender"]
+                columns = ["age", "height(cm)", "weight(kg)", "gender", "hearing(left)", "hearing(right)", "triglyceride",
+                           "dental caries", "tartar"]
                 print(columns)
-                prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
+                prRed("Age - height(cm) - weight(kg) - gender are obligatory to enter!")
                 value = [None] * len(columns)
                 while i < len(columns):
                     if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
                         prRed("The range of allowed values are multiples of 5")
-                        print("The minimum acceptable \"", columns[i], "\"value is:", df_smoke[columns[i]].min(),
+                        print("The minimum acceptable \"", columns[i], "\" value is:", df_smoke[columns[i]].min(),
                               "The maximum is:", df_smoke[columns[i]].max())
                         print("Insert ", columns[i], " value: ")
                     elif columns[i] != "tartar" and columns[i] != "dental caries" and columns[i] != "gender":
                         print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
+                    elif columns[i] == "gender":
+                        print("Insert ", columns[i], " value (0 = Man, 1 = Woman)")
+                    elif (columns[i] == "hearing(left)") or (columns[i] == "hearing(right)"):
+                        print("Insert ", columns[i], " value (Acceptable values range from 0 to 2)")
                     else:
                         print("Insert ", columns[i], " value (0 = No, 1 = Yes, -1 = Data not available): ")
                     value[i] = int(input())
@@ -511,6 +515,15 @@ if __name__ == '__main__':
                             prRed("Error! You have not entered a multiple of 5")
                         else:
                             i = i + 1
+                    elif columns[i] == "gender":
+                        if value[i] <= 0:
+                            prRed("Insert value >= 0")
+                        elif value[i] < df_smoke[columns[i]].min():
+                            prRed("Error! You entered too small value!")
+                        elif value[i] > df_smoke[columns[i]].max():
+                            prRed("Error! You entered too large value!")
+                        else:
+                            i = i + 1
                     else:
                         if value[i] == -1 and ():
                             prRed("Insert value >= 0")
@@ -520,6 +533,8 @@ if __name__ == '__main__':
                             prRed("Error! Insert value (0 = No, 1 = Yes): ")
                         elif (columns[i] == "dental caries") and (value[i] > 1):
                             prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                        elif (columns[i] == "hearing(left)" or columns[i] == "hearing(right)") and (value[i] > 2 or value[i] < 0):
+                            prRed("Error! Insert value in range 0 - 2")
                         else:
                             i = i + 1
                 try:
