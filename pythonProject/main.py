@@ -404,9 +404,10 @@ if __name__ == '__main__':
     prRed("Test on a non-smoker female subject")
     woman = data.query(show_progress=False, variables=['gender'], evidence={'age': 40, 'height(cm)': 160,
                                                                              'weight(kg)': 65, 'Gtp': 34,  'HDL': 55,
-                                                                             'serum creatinine': 0, 'systolic': 126, 'ALT': 15,
-                                                                             'eyesight(left)': 1,'eyesight(right)': 0,
-                                                                             'hemoglobin': 13, 'smoking': 0})
+                                                                             'serum creatinine': 0, 'systolic': 126,
+                                                                            'ALT': 15, 'eyesight(left)': 1,
+                                                                            'eyesight(right)': 0, 'hemoglobin': 13,
+                                                                            'smoking': 0})
     print(woman, '\n')
     prRed("Test on a non-smoker male subject")
     man = data.query(show_progress=False, variables=['gender'], evidence={'age': 75, 'height(cm)': 160,
@@ -422,7 +423,8 @@ if __name__ == '__main__':
     prRed("Test on a smoker female subject")
     woman = data.query(show_progress=False, variables=['gender'], evidence={'age': 40, 'height(cm)': 160,
                                                                              'weight(kg)': 65, 'Gtp': 34,  'HDL': 55,
-                                                                             'serum creatinine': 0, 'systolic': 126, 'ALT': 15,
+                                                                             'serum creatinine': 0, 'systolic': 126,
+                                                                            'ALT': 15,
                                                                              'eyesight(left)': 1,'eyesight(right)': 0,
                                                                              'hemoglobin': 13, 'smoking': 1})
     print(woman, '\n')
@@ -448,8 +450,9 @@ if __name__ == '__main__':
 
     # Test on Potentially non-smoker subject
     TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
-                               evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'gender': 1, 'triglyceride': 148,
-                                           'hearing(left)': 1, 'hearing(right)': 1,'dental caries': 1, 'tartar': 1})
+                               evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'gender': 1,
+                                         'triglyceride': 148, 'hearing(left)': 1, 'hearing(right)': 1,
+                                         'dental caries': 1, 'tartar': 1})
 
     prGreen('\nTest on Potentially non-smoker subject:')
     print(TestNotSmoker, '\n')
@@ -516,7 +519,7 @@ if __name__ == '__main__':
                         else:
                             i = i + 1
                     elif columns[i] == "gender":
-                        if value[i] <= 0:
+                        if value[i] < 0:
                             prRed("Insert value >= 0")
                         elif value[i] < df_smoke[columns[i]].min():
                             prRed("Error! You entered too small value!")
@@ -525,7 +528,7 @@ if __name__ == '__main__':
                         else:
                             i = i + 1
                     else:
-                        if value[i] == -1 and ():
+                        if value[i] == -1:
                             prRed("Insert value >= 0")
                         elif value[i] <= -2:
                             prRed("Insert value >= 0")
