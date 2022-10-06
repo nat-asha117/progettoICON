@@ -166,7 +166,7 @@ if __name__ == '__main__':
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-    kf = RepeatedKFold(n_splits=5, n_repeats=5)
+    kf = RepeatedKFold(n_splits=5, n_repeats=1)
 
     # Classifiers for the purpose of evaluation
     knn = KNeighborsClassifier()
@@ -356,7 +356,6 @@ if __name__ == '__main__':
     prYellow("\n\t\tCreation of the Bayesian Network\n")
 
     # Converting all values within the dataframe to integers
-    df_smoke = df_smoke.drop("oral", axis=1)
     df_smoke_int = np.array(df_smoke, dtype=int)
     df_smoke = pd.DataFrame(df_smoke_int, columns=df_smoke.columns)
 
@@ -375,13 +374,14 @@ if __name__ == '__main__':
 
     # Graph of nodes
 
-    G = nx.MultiDiGraph()
-    G.add_edges_from(k2_model.edges())
-    pos = nx.spring_layout(G, iterations=20)
-    nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap(),
-                           node_size=175)
-    nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="baseline")
-    nx.draw_networkx_edges(G, pos, arrows=True, edge_color="r")
+    G = nx.MultiDiGraph(k2_model.edges())
+    G.add_edges_from(bNet.edges())
+    pos = nx.spring_layout(G, iterations=100, k=2, threshold=5, pos=nx.spiral_layout(G))
+    nx.draw_networkx_nodes(G, pos, node_size=150, node_color="#ff574c")
+    nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="center_baseline")
+    nx.draw_networkx_edges(G, pos, arrows=True, arrowsize=5, arrowstyle="->", edge_color="purple",
+                           connectionstyle="angle3,angleA=90,angleB=0", min_source_margin=1.2, min_target_margin=1.5, edge_vmin=2, edge_vmax=2)
+
     plt.title("BAYESIAN NETWORK GRAPH")
     plt.show()
 
@@ -401,7 +401,7 @@ if __name__ == '__main__':
     data = VariableElimination(bNet)  # inference
 
     prGreen("Probability control of features that affect gender:")
-    prRed("Test on a non-smoker female subject")
+    prGreen("Test on a non-smoker female subject")
     woman = data.query(show_progress=False, variables=['gender'], evidence={'age': 40, 'height(cm)': 160,
                                                                              'weight(kg)': 65, 'Gtp': 34,  'HDL': 55,
                                                                              'serum creatinine': 0, 'systolic': 126,
@@ -409,7 +409,7 @@ if __name__ == '__main__':
                                                                             'eyesight(right)': 0, 'hemoglobin': 13,
                                                                             'smoking': 0})
     print(woman, '\n')
-    prRed("Test on a non-smoker male subject")
+    prGreen("Test on a non-smoker male subject")
     man = data.query(show_progress=False, variables=['gender'], evidence={'age': 75, 'height(cm)': 160,
                                                                             'weight(kg)': 70, 'Gtp': 17, 'HDL': 71,
                                                                             'serum creatinine': 0, 'systolic': 128,
