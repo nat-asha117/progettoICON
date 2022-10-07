@@ -52,7 +52,8 @@ def simulationThread(bNet, value, data, evemt):
                                                 })
         if UserInputUpdated.values[0] > 0.50:
             time.sleep(1)
-            newValue = newValue.drop(["serum creatinine","eyesight(right)", "eyesight(left)", "Cholesterol", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
+            newValue = newValue.drop(["ALT","waist(cm)","Gtp", "serum creatinine","eyesight(right)", "eyesight(left)",
+                                      "Cholesterol", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
             prYellow("Suggested values:")
             print(newValue)
             prYellow("New probability based on suggested values")
