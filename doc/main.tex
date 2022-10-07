@@ -84,8 +84,9 @@ L'obiettivo è quello di determinare la presenza o l'assenza del fumo attraverso
 Link sorgente: \href{https://www.kaggle.com/datasets/kukuroo3/body-signal-of-smoking}{clicca qui}
 
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{display1}
-        \includegraphics[width=0.9\textwidth]{display2}
+        \includegraphics[width=0.9\textwidth]{display 1}
+        \includegraphics[width=0.9\textwidth]{display 2}
+        \includegraphics[width=0.9\textwidth]{display 3}
         \centering
         \caption{Anteprima del dataset}
         \centering
@@ -97,19 +98,27 @@ Il dataset non presenta problemi di mancanza dei dati.
 \subsubsection{Feature dicotomiche}
 Una feature dicotomica è una feature che presenta soltanto due modalità. 
 Sono dicotomiche feature con valori come \{si, no\}, oppure \{vero, falso\}. In questo caso verranno assegnati i valori \{0,1\} rispettivamente alle due modalità, verrà sostituito
-il valore iniziale della modalità con il nuovo valore assegnato. Ad esempio, la feature:
+il valore iniziale della modalità con il nuovo valore assegnato. Nel nostro caso, le features dicotomiche sono:
 \begin{itemize}
     \item \textbf{tartar}: \{vero, falso\} in \{0,1\}
+    \item \textbf{oral}: \{vero, falso\} in \{0,1\}
+    \item \textbf{gender}: \{vero, falso\} in \{0,1\}
 \end{itemize}
 
 \subsubsection{Features presenti nel dataset}
-Per ridurre la complessità, si scelto di eliminare le features presenti nel dataset che hanno significatività bassa o tendendete a 0. 
+Per ridurre la complessità, si è scelto di eliminare la feature \textit{ID}, presente nel dataset, in quanto ha significatività bassa o tendendete a 0, essendo un semplice indice del dataset. 
 Qui sotto sono elencante le features principali del dataset dopo la features selection:
 \begin{itemize}
+    \item \textbf{gender}
     \item \textbf{age} : 5 anni di intervallo
     \item \textbf{height(cm)} : 5 anni di intervallo
     \item \textbf{weight(kg)} : 5 anni di intervallo
-    \item \textbf{systolic} 
+    \item \textbf{waist(cm)} : lunghezza circonferenza vita
+    \item \textbf{eyesight(left)}
+    \item \textbf{eyesight(right)}
+    \item \textbf{hearing(left)} 
+    \item \textbf{hearing(right)}
+    \item \textbf{systolic} : pressione sanguigna
     \item \textbf{relaxation} : pressione sanguigna
     \item \textbf{fasting blood sugar}
     \item \textbf{cholesterol} :  totale
@@ -122,6 +131,7 @@ Qui sotto sono elencante le features principali del dataset dopo la features sel
     \item \textbf{AST} : tipo glutammico ossalacetico transaminasi
     \item \textbf{ALT} : tipo glutammico ossalacetico transaminasi
     \item \textbf{Gtp} 
+    \item \textbf{oral} : stato dell'esame orale
     \item \textbf{dental caries}
     \item \textbf{tartar} : stato tartaro
     \item \textbf{smoking}
@@ -132,6 +142,7 @@ Mediante la stampa di una tabella, viene mostrato a schermo una panoramica inere
 \begin{figure}[H]
         \includegraphics[width=0.9\textwidth]{info1}
         \includegraphics[width=0.9\textwidth]{info2}
+        \includegraphics[width=0.9\textwidth]{info3}
         \centering
         \caption{Informazioni inerenti al dataset}
         \centering
@@ -257,7 +268,7 @@ In particolare:
 %
 
 \noindent
-Basandoci, dunque, su tali performance, abbiamo riscontrato che il classificatore migliore risulta essere il Random Forest.
+Basandoci su tali performance, in particolare su quella del \textbf{F1-score}, abbiamo riscontrato che il classificatore migliore risulta essere il Random Forest.
 
 \subsection{Verifica dell'importanza delle features}
 A seguito dell'analisi effettuata in precedenza, abbiamo generato un grafico che estrae le features più importanti derivanti proprio dal Random Forest:  
@@ -271,47 +282,91 @@ A seguito dell'analisi effettuata in precedenza, abbiamo generato un grafico che
 %
 
 \noindent
-Possiamo notare che l'emoglobina e il gtp
+Possiamo notare che il genere, l'emoglobina e il gtp
 sono le caratteristiche mediche predittive più importanti per la diagnostica di un soggetto potenzialmente fumatore o meno.
 
-\section{Apprendimento non Supervisionato}
 \subsection{Creazione della rete bayesiana}
-Per lo sviluppo dell’apprendimento non supervisionato abbiamo scelto di implementare una rete bayesiana, utilizzando come metodo di scoring il \textit{K2score} e come stimatore il \textit{MaximumLikeliHoodEstimato}. In questo modo la predizione avverrà in base alle nostre features.\\
+Abbiamo scelto di implementare una rete bayesiana per poter effettuare delle interrogazione per verficare le probabilità delle features; utilizzando come metodo di scoring il \textit{K2score} e come stimatore il \textit{MaximumLikeliHoodEstimato}. In questo modo la predizione avverrà in base alle nostre features.\\
 %
-Per accertarci dell'effettiva creazione della rete, visualizziamo i nodi e gli archi della rete:
 
 \begin{figure}[H]
-        \includegraphics[width=16.5cm]{nodi}
+        \includegraphics[width=16.5cm]{rete}
         \centering
-        \caption{Nodi della rete bayesiana}
-        \centering
-\end{figure}
-
-\begin{figure}[H]
-        \includegraphics[width=16.5cm]{archi}
-        \centering
-        \caption{Archi della rete bayesiana}
+        \caption{Grafo della rete bayesiana}
         \centering
 \end{figure}
 %
+
+
+\subsubsection{Calcolo della probabilità}
+
+Sfruttando la rete bayesiana precedentemente creata, calcoliamo le probabilità per le features \textit{gender} e \textit{smoking}.
+
+\paragraph{Gender}
+Dalle osservazioni precedenti è emerso che la feature \textit{gender} influenza diverse features, ragion per cui osserviamo con delle interrogazioni tali influenze.
 
 \noindent
-Data una variabile X, solo alcune variabili influenzano direttamente il suo valore.\\Le variabili che influenzano localmente sono dette \textit{Markov Blanket}. 
+Data una variabile X, solo alcune variabili influenzano direttamente il suo valore.\\Le variabili che influenzano localmente sono dette \textit{Markov Blanket}.\\
+Le Markov blanket di \textit{gender}, quindi, sono:
+
+\begin{figure}[H]
+        \includegraphics[width=0.9\textwidth]{MARKgen}
+        \centering
+        \caption{Markov blanket di \textit{gender}}
+        \centering
+\end{figure}
+
+Tenendo in considerazione le Markov blanket di \textit{gender}, abbiamo effettuato interrogazioni sulla rete con un soggetto femminile ed uno maschile non fumatori. 
+
+\begin{figure}[H]
+        \includegraphics[width=10.6cm]{notSmokeGen}
+        \centering
+        \caption{Probabilità ottenute}
+        \centering
+\end{figure}
+
+Per ottenere tali dati, abbiamo effettuato le seguenti query:
+\begin{enumerate}
+    \item contenente i dati di un soggetto femminile;
+    \item contenente i dati di un soggetto maschile.
+\end{enumerate}
+\begin{figure}[H]
+        \includegraphics[width=0.9\textwidth]{queryWomanNoTSmoke}
+        \includegraphics[width=0.9\textwidth]{queryManNoTSmoke}
+        \centering
+        \caption{Query effettuate}
+        \centering
+\end{figure}
+%
+
+Abbiamo effettuato le query sopra indicate, considerando i soggetti, questa volta, come fumatori.
+Ottenendo come risultati:
+
+\begin{figure}[H]
+        \includegraphics[width=10.6cm]{smokeGen}
+        \centering
+        \caption{Probabilità ottenute}
+        \centering
+\end{figure}
+
+
+\paragraph{Smoking}
+
+Le Markov Blanket di \textit{smoking}, invece, sono:
 
 \begin{figure}[H]
         \includegraphics[width=0.9\textwidth]{MARK}
         \centering
-        \caption{Markov blaket di \textit{smoking}}
+        \caption{Markov blanket di \textit{smoking}}
         \centering
 \end{figure}
 
-
-\subsection{Calcolo della probabilità}
-Sfruttando la rete bayesiana precedente creata, calcoliamo la probabilità per un soggetto presumibilmente non fumatore (0) ed uno fumatore (1) di esserlo o meno. Il soggetto preso in analisi ha età, altezza e peso standard, ovvero età: 20, altezza: 170, peso: 60.
+%
+Sfruttando la rete bayesiana, calcoliamo la probabilità per un soggetto presumibilmente non fumatore (0) ed uno fumatore (1) di esserlo o meno. Il soggetto di genere femminile preso in analisi ha età, altezza e peso standard, ovvero età: 20, altezza: 170, peso: 60.
 
 \begin{figure}[H]
-        \includegraphics[width=10.6cm]{imagePNS}
-        \includegraphics[width=10.6cm]{imagePS}
+        \includegraphics[width=10.6cm]{probNotSmoke}
+        \includegraphics[width=10.6cm]{probSmoke}
         \centering
         \caption{Probabilità ottenute}
         \centering
@@ -323,8 +378,8 @@ Per ottenere tali dati, abbiamo effettuato due query:
     \item contenente i dati di una persona fumatrice.
 \end{enumerate}
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{query1}
-        \includegraphics[width=0.9\textwidth]{query2}
+        \includegraphics[width=0.9\textwidth]{queryNotSmoke}
+        \includegraphics[width=0.9\textwidth]{querySmoke}
         \centering
         \caption{Query effettuate}
         \centering
@@ -332,23 +387,23 @@ Per ottenere tali dati, abbiamo effettuato due query:
 %
 
 \noindent
-Per verificare l'effettiva rilevanza delle features all'interno della rete bayesiana, abbiamo effettuato anche dei test sui soggetti presi in considerazione; riscontrando  che cambiando le features più importanti, le percentuali cambiano drasticamente.
+Per verificare l'effettiva rilevanza delle features all'interno della rete bayesiana, abbiamo effettuato anche dei test sui soggetti presi in considerazione; riscontrando  che le features che influenzano maggiornamente risultano essere: \textit{triglyceride}, \textit{dental caries}, \textit{tartar}.   
 %
 
 \noindent
 Ottenendo come probabilità:
 
 \begin{figure}[H]
-        \includegraphics[width=10.6cm]{prob1}
-        \includegraphics[width=10.6cm]{prob2}
+        \includegraphics[width=10.6cm]{testSmoke}
+        \includegraphics[width=10.6cm]{testNotSmoke}
         \centering
         \caption{Probabilità ottenute dai test}
         \centering
 \end{figure}
 
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{query3}
-        \includegraphics[width=0.9\textwidth]{query4}
+        \includegraphics[width=0.9\textwidth]{queryTestSmok}
+        \includegraphics[width=0.9\textwidth]{queryTestNotSMok}
         \centering
         \caption{Query effettuate per i test}
         \centering
@@ -366,11 +421,10 @@ Da questi test è emerso che le features più rilevanti sono: gtp, triglyceride,
         \centering
 \end{figure}
 
-L'utente può decidere di interagire con la knowledge base effettuando interrogazioni su quest’ultima. Per poterlo fare, bisogna inserire i dati relativi alla sua età, altezza e peso obbligatoriamente (rispettando i valori ed i controlli segnalati). Per i restanti valori, quali gtp, triglyceride,
-HDL, hemoglobin, serum creatinine, dental caries, tartar, l'utente, se non si è a conoscenza di uno di essi (o di tutti) può scegliere di non inserirli e quindi effettuare una interrogazione "parziale". Nell'eventualità che l'utente inserisca valori non validi o fuori range, indicato viene segnalato l'errore.
+L'utente può decidere di interagire con la knowledge base effettuando interrogazioni su quest’ultima. Per poterlo fare, bisogna inserire i dati relativi alla sua età, altezza, peso e genere obbligatoriamente (rispettando i valori ed i controlli segnalati, ove dovuti). Per i restanti valori, quali triglyceride, hearing(left), hearing(right), dental caries, tartar, l'utente se non è a conoscenza di uno di essi (o di tutti) può scegliere di non inserirli e quindi effettuare una interrogazione "parziale". Nell'eventualità che l'utente inserisca valori non validi o fuori range indicato, viene segnalato l'errore.
 
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{interazione}
+        \includegraphics[width=0.9\textwidth]{interazione1}
         \centering
         \caption{Inserimento dei valori}
         \centering
@@ -389,7 +443,7 @@ Successivamente, viene visualizzata la probabilità risultante dai valori impost
 %
 
 \noindent
-Nel caso in cui la probabilità di essere un fumatore dovesse risultare superiore al 50\%, il sistema chiede all'utente se desidera riceve suggerimenti, ottenuti mediante una predizione, di valori ai quali ambire per poter risultare un non fumatore; tali valori sono ottenuti partendo dai valori di età, altezza e peso.
+Nel caso in cui la probabilità di essere un fumatore dovesse risultare superiore al 50\%, il sistema chiede all'utente se desidera riceve suggerimenti, ottenuti mediante una predizione, di valori ai quali ambire per poter risultare un non fumatore; tali valori sono ottenuti partendo dai valori di età, altezza, peso e genere.
 Se il sistema dovesse trovare una combinazione valida, ovvero con probabilità inferiore al 50\%, viene visualizzata come segue:
 
 \begin{figure}[H]
