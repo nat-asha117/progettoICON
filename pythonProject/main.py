@@ -37,23 +37,22 @@ def simulationThread(bNet, value, data, evemt):
     time.sleep(1)
     while True:
         newValue = bNet.simulate(show_progress=False, n_samples=1,
-                                 evidence={'smoking': 0, 'age': value[0],
-                                           'height(cm)': value[1],
-                                           'weight(kg)': value[2]})
-        newValue = newValue.drop(["Cholesterol", "smoking", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
+                                 evidence={'smoking': 0, 'age': value[0], 'height(cm)': value[1],
+                                           'weight(kg)': value[2], 'gender': value[3]})
         UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
                                       evidence={'age': newValue.get("age")[0],
                                                 'height(cm)': newValue.get("height(cm)")[0],
                                                 'weight(kg)': newValue.get("weight(kg)")[0],
                                                 'gender': newValue.get("gender")[0],
+                                                'hearing(left)': newValue.get("hearing(left)")[0],
+                                                'hearing(right)': newValue.get("hearing(right)")[0],
                                                 'triglyceride': newValue.get("triglyceride")[0],
-                                                'serum creatinine': newValue.get("serum creatinine")[0],
                                                 "dental caries": newValue.get("dental caries")[0],
                                                 'tartar': newValue.get("tartar")[0],
-                                                'hearing(left)': newValue.get("hearing(left)"[0]),
-                                                'hearing(right)': newValue.get("hearing(right)"[0])})
+                                                })
         if UserInputUpdated.values[0] > 0.50:
             time.sleep(1)
+            newValue = newValue.drop(["serum creatinine","eyesight(right)", "eyesight(left)", "Cholesterol", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
             prYellow("Suggested values:")
             print(newValue)
             prYellow("New probability based on suggested values")
