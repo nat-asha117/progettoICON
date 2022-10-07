@@ -166,7 +166,7 @@ if __name__ == '__main__':
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-    kf = RepeatedKFold(n_splits=5, n_repeats=1)
+    kf = RepeatedKFold(n_splits=5, n_repeats=5)
 
     # Classifiers for the purpose of evaluation
     knn = KNeighborsClassifier()
