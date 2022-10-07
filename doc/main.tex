@@ -290,7 +290,7 @@ Abbiamo scelto di implementare una rete bayesiana per poter effettuare delle int
 %
 
 \begin{figure}[H]
-        \includegraphics[width=16.5cm]{grafoR}
+        \includegraphics[width=16.5cm]{rete}
         \centering
         \caption{Grafo della rete bayesiana}
         \centering
@@ -319,8 +319,7 @@ Le Markov blanket di \textit{gender}, quindi, sono:
 Tenendo in considerazione le Markov blanket di \textit{gender}, abbiamo effettuato interrogazioni sulla rete con un soggetto femminile ed uno maschile non fumatori. 
 
 \begin{figure}[H]
-        \includegraphics[width=10.6cm]{imagePNS}
-        \includegraphics[width=10.6cm]{imagePS}
+        \includegraphics[width=10.6cm]{notSmokeGen}
         \centering
         \caption{Probabilità ottenute}
         \centering
@@ -332,8 +331,8 @@ Per ottenere tali dati, abbiamo effettuato le seguenti query:
     \item contenente i dati di un soggetto maschile.
 \end{enumerate}
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{query1}
-        \includegraphics[width=0.9\textwidth]{query2}
+        \includegraphics[width=0.9\textwidth]{queryWomanNoTSmoke}
+        \includegraphics[width=0.9\textwidth]{queryManNoTSmoke}
         \centering
         \caption{Query effettuate}
         \centering
@@ -344,8 +343,7 @@ Abbiamo effettuato le query sopra indicate, considerando i soggetti, questa volt
 Ottenendo come risultati:
 
 \begin{figure}[H]
-        \includegraphics[width=10.6cm]{imagePNS}
-        \includegraphics[width=10.6cm]{imagePS}
+        \includegraphics[width=10.6cm]{smokeGen}
         \centering
         \caption{Probabilità ottenute}
         \centering
@@ -367,8 +365,8 @@ Le Markov Blanket di \textit{smoking}, invece, sono:
 Sfruttando la rete bayesiana, calcoliamo la probabilità per un soggetto presumibilmente non fumatore (0) ed uno fumatore (1) di esserlo o meno. Il soggetto di genere femminile preso in analisi ha età, altezza e peso standard, ovvero età: 20, altezza: 170, peso: 60.
 
 \begin{figure}[H]
-        \includegraphics[width=10.6cm]{imagePNS}
-        \includegraphics[width=10.6cm]{imagePS}
+        \includegraphics[width=10.6cm]{probNotSmoke}
+        \includegraphics[width=10.6cm]{probSmoke}
         \centering
         \caption{Probabilità ottenute}
         \centering
@@ -380,8 +378,8 @@ Per ottenere tali dati, abbiamo effettuato due query:
     \item contenente i dati di una persona fumatrice.
 \end{enumerate}
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{query1}
-        \includegraphics[width=0.9\textwidth]{query2}
+        \includegraphics[width=0.9\textwidth]{queryNotSmoke}
+        \includegraphics[width=0.9\textwidth]{querySmoke}
         \centering
         \caption{Query effettuate}
         \centering
@@ -396,16 +394,16 @@ Per verificare l'effettiva rilevanza delle features all'interno della rete bayes
 Ottenendo come probabilità:
 
 \begin{figure}[H]
-        \includegraphics[width=10.6cm]{prob1}
-        \includegraphics[width=10.6cm]{prob2}
+        \includegraphics[width=10.6cm]{testSmoke}
+        \includegraphics[width=10.6cm]{testNotSmoke}
         \centering
         \caption{Probabilità ottenute dai test}
         \centering
 \end{figure}
 
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{query3}
-        \includegraphics[width=0.9\textwidth]{query4}
+        \includegraphics[width=0.9\textwidth]{queryTestSmok}
+        \includegraphics[width=0.9\textwidth]{queryTestNotSMok}
         \centering
         \caption{Query effettuate per i test}
         \centering
@@ -426,7 +424,7 @@ Da questi test è emerso che le features più rilevanti sono: gtp, triglyceride,
 L'utente può decidere di interagire con la knowledge base effettuando interrogazioni su quest’ultima. Per poterlo fare, bisogna inserire i dati relativi alla sua età, altezza, peso e genere obbligatoriamente (rispettando i valori ed i controlli segnalati, ove dovuti). Per i restanti valori, quali triglyceride, hearing(left), hearing(right), dental caries, tartar, l'utente se non è a conoscenza di uno di essi (o di tutti) può scegliere di non inserirli e quindi effettuare una interrogazione "parziale". Nell'eventualità che l'utente inserisca valori non validi o fuori range indicato, viene segnalato l'errore.
 
 \begin{figure}[H]
-        \includegraphics[width=0.9\textwidth]{interazione}
+        \includegraphics[width=0.9\textwidth]{interazione1}
         \centering
         \caption{Inserimento dei valori}
         \centering
