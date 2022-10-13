@@ -18,7 +18,7 @@ from pgmpy.models import BayesianNetwork
 
 # Machine learning
 from sklearn import metrics
-from sklearn.model_selection import RepeatedKFold
+from sklearn.model_selection import RepeatedKFold, cross_val_score
 
 # Classification algorithms
 from sklearn.ensemble import RandomForestClassifier
@@ -93,6 +93,8 @@ def prYellow(prt):
 def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
 
+def printProbability(data, var):
+    print(var, "probability:", data.values[1], "\n")
 
 if __name__ == '__main__':
     # Import of the dataset
@@ -290,13 +292,18 @@ if __name__ == '__main__':
                                                })
 
                 df_smoke_models.append(df_smoke_model)
-
             return df_smoke_models
 
     # Visualization of the table with metrics and Graph
     df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # concatenation of the models
     df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # removal of the index
     print("\n", df_smoke_models_concat)  # table display
+    print("\nStandard deviation for Knn:", np.std(cross_val_score(knn, X, y, cv=5)))
+    print("\nStandard deviation for DecisionTree:", np.std(cross_val_score(dtc, X, y, cv=5)))
+    print("\nStandard deviation for RandomForest:", np.std(cross_val_score(rfc, X, y, cv=5)))
+    print("\nStandard deviation for SVM:", np.std(cross_val_score(svc, X, y, cv=5)))
+    print("\nStandard deviation for BernoulliNB:", np.std(cross_val_score(bnb, X, y, cv=5)))
+    print("\nStandard deviation for GaussianNB:", np.std(cross_val_score(gnb, X, y, cv=5)))
 
     # Accuracy Graph
     x = df_smoke_models_concat.model
@@ -355,6 +362,9 @@ if __name__ == '__main__':
 
     prYellow("\n\t\tCreation of the Bayesian Network\n")
 
+    # Removing unnecessary features
+    df_smoke = df_smoke.drop(["oral", "Cholesterol", "LDL"], axis=1)
+
     # Converting all values within the dataframe to integers
     df_smoke_int = np.array(df_smoke, dtype=int)
     df_smoke = pd.DataFrame(df_smoke_int, columns=df_smoke.columns)
@@ -378,8 +388,8 @@ if __name__ == '__main__':
     G.add_edges_from(bNet.edges())
     pos = nx.spring_layout(G, iterations=100, k=2, threshold=5, pos=nx.spiral_layout(G))
     nx.draw_networkx_nodes(G, pos, node_size=150, node_color="#ff574c")
-    nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="center_baseline")
-    nx.draw_networkx_edges(G, pos, arrows=True, arrowsize=5, arrowstyle="->", edge_color="purple",
+    nx.draw_networkx_labels(G, pos, font_size=10, font_weight="bold", clip_on=True, horizontalalignment="center", verticalalignment="bottom")
+    nx.draw_networkx_edges(G, pos, arrows=True, arrowsize=7, arrowstyle="->", edge_color="purple",
                            connectionstyle="angle3,angleA=90,angleB=0", min_source_margin=1.2, min_target_margin=1.5, edge_vmin=2, edge_vmax=2)
 
     plt.title("BAYESIAN NETWORK GRAPH")
