@@ -298,12 +298,6 @@ if __name__ == '__main__':
     df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # concatenation of the models
     df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # removal of the index
     print("\n", df_smoke_models_concat)  # table display
-    print("\nStandard deviation for Knn:", np.std(cross_val_score(knn, X, y, cv=5)))
-    print("\nStandard deviation for DecisionTree:", np.std(cross_val_score(dtc, X, y, cv=5)))
-    print("\nStandard deviation for RandomForest:", np.std(cross_val_score(rfc, X, y, cv=5)))
-    print("\nStandard deviation for SVM:", np.std(cross_val_score(svc, X, y, cv=5)))
-    print("\nStandard deviation for BernoulliNB:", np.std(cross_val_score(bnb, X, y, cv=5)))
-    print("\nStandard deviation for GaussianNB:", np.std(cross_val_score(gnb, X, y, cv=5)))
 
     # Accuracy Graph
     x = df_smoke_models_concat.model
@@ -337,6 +331,25 @@ if __name__ == '__main__':
     plt.title("F1score")
     plt.show()
 
+    # Standard deviation
+    std_knn = np.std(cross_val_score(knn, X_test, y_test, cv=5, n_jobs=5))
+    std_dtc = np.std(cross_val_score(dtc, X_test, y_test, cv=5, n_jobs=5))
+    std_rfc = np.std(cross_val_score(rfc, X_test, y_test, cv=5, n_jobs=5))
+    std_svc = np.std(cross_val_score(svc, X_test, y_test, cv=5, n_jobs=5))
+    std_bnd = np.std(cross_val_score(bnb, X_test, y_test, cv=5, n_jobs=5))
+    std_gnb = np.std(cross_val_score(gnb, X_test, y_test, cv=5, n_jobs=5))
+    plt.plot(["KNN", "DecisionTree", "RandomForest", "SVM", "BernoulliNB", "GaussianNB"],
+             [std_knn, std_dtc, std_rfc, std_svc, std_bnd, std_gnb])
+    plt.title("Standard deviation")
+    plt.ylabel("Standard deviation value")
+    plt.xlabel("Classifiers")
+    plt.show()
+    print("\nStandard deviation for Knn:", std_knn)
+    print("\nStandard deviation for DecisionTree:", std_dtc)
+    print("\nStandard deviation for RandomForest:", std_rfc)
+    print("\nStandard deviation for SVM:", std_svc)
+    print("\nStandard deviation for BernoulliNB:", std_bnd)
+    print("\nStandard deviation for GaussianNB:", std_gnb)
     # VERIFICATION OF THE IMPORTANCE OF FEATURES
 
     # Creation of X feature and target y
