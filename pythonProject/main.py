@@ -52,8 +52,9 @@ def simulationThread(bNet, value, data, evemt):
                                                 })
         if UserInputUpdated.values[0] > 0.50:
             time.sleep(1)
-            newValue = newValue.drop(["ALT","waist(cm)","Gtp", "serum creatinine","eyesight(right)", "eyesight(left)",
-                                      "Cholesterol", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
+            newValue = newValue.drop(
+                ["ALT", "waist(cm)", "Gtp", "serum creatinine", "eyesight(right)", "eyesight(left)",
+                 "Cholesterol", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
             prYellow("Suggested values:")
             print(newValue)
             prYellow("New probability based on suggested values")
@@ -71,7 +72,7 @@ def prRedMoreString(prt, prt2, prt3):
 
 
 def prYellowMoreString(prt, prt2, prt3):
-    print("\033[91m{}\033[00m".format(prt),"\033[91m{}\033[00m".format(prt2),"\033[91m{}\033[00m".format(prt3))
+    print("\033[91m{}\033[00m".format(prt), "\033[91m{}\033[00m".format(prt2), "\033[91m{}\033[00m".format(prt3))
 
 
 def prGreenMoreString(prt, prt2, prt3):
@@ -93,8 +94,10 @@ def prYellow(prt):
 def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
 
+
 def printProbability(data, var):
     print(var, "probability:", data.values[1], "\n")
+
 
 if __name__ == '__main__':
     # Import of the dataset
@@ -102,8 +105,6 @@ if __name__ == '__main__':
         df = pd.read_csv(sys.argv[1])
     else:
         df = pd.read_csv("C:\\Users\\verio\\repo\\progettoICON\\pythonProject\\smoking.csv")
-
-
 
     # DATASET OPTIMIZATION:
 
@@ -278,6 +279,7 @@ if __name__ == '__main__':
         model['GaussianNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_gnb))
         model['GaussianNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_gnb))
 
+
         # report template
         def model_report(model):
 
@@ -401,9 +403,11 @@ if __name__ == '__main__':
     G.add_edges_from(bNet.edges())
     pos = nx.spring_layout(G, iterations=100, k=2, threshold=5, pos=nx.spiral_layout(G))
     nx.draw_networkx_nodes(G, pos, node_size=150, node_color="#ff574c")
-    nx.draw_networkx_labels(G, pos, font_size=10, font_weight="bold", clip_on=True, horizontalalignment="center", verticalalignment="bottom")
+    nx.draw_networkx_labels(G, pos, font_size=10, font_weight="bold", clip_on=True, horizontalalignment="center",
+                            verticalalignment="bottom")
     nx.draw_networkx_edges(G, pos, arrows=True, arrowsize=7, arrowstyle="->", edge_color="purple",
-                           connectionstyle="angle3,angleA=90,angleB=0", min_source_margin=1.2, min_target_margin=1.5, edge_vmin=2, edge_vmax=2)
+                           connectionstyle="angle3,angleA=90,angleB=0", min_source_margin=1.2, min_target_margin=1.5,
+                           edge_vmin=2, edge_vmax=2)
 
     plt.title("BAYESIAN NETWORK GRAPH")
     plt.show()
@@ -416,7 +420,6 @@ if __name__ == '__main__':
     prYellow("\nMarkov blanket for \"gender\"")
     print(bNet.get_markov_blanket('gender'), "\n")
 
-
     # CALCULATION OF THE PROBABILITY
     #  calculation for a supposed non-smoker (0) and a smoker (1)
 
@@ -426,30 +429,30 @@ if __name__ == '__main__':
     prGreen("Probability control of features that affect gender:")
     prGreen("Test on a non-smoker female subject")
     woman = data.query(show_progress=False, variables=['gender'], evidence={'age': 40, 'height(cm)': 160,
-                                                                             'weight(kg)': 65, 'Gtp': 34,  'HDL': 55,
-                                                                             'serum creatinine': 0, 'systolic': 126,
+                                                                            'weight(kg)': 65, 'Gtp': 34, 'HDL': 55,
+                                                                            'serum creatinine': 0, 'systolic': 126,
                                                                             'ALT': 15, 'eyesight(left)': 1,
                                                                             'eyesight(right)': 0, 'hemoglobin': 13,
                                                                             'smoking': 0})
     print(woman, '\n')
     prGreen("Test on a non-smoker male subject")
     man = data.query(show_progress=False, variables=['gender'], evidence={'age': 75, 'height(cm)': 160,
-                                                                            'weight(kg)': 70, 'Gtp': 17, 'HDL': 71,
-                                                                            'serum creatinine': 0, 'systolic': 128,
-                                                                            'ALT': 16,
-                                                                            'eyesight(left)': 0, 'eyesight(right)': 1,
-                                                                            'hemoglobin': 15, 'smoking': 0})
+                                                                          'weight(kg)': 70, 'Gtp': 17, 'HDL': 71,
+                                                                          'serum creatinine': 0, 'systolic': 128,
+                                                                          'ALT': 16,
+                                                                          'eyesight(left)': 0, 'eyesight(right)': 1,
+                                                                          'hemoglobin': 15, 'smoking': 0})
     print(man, '\n')
 
     # Smoker
 
     prRed("Test on a smoker female subject")
     woman = data.query(show_progress=False, variables=['gender'], evidence={'age': 40, 'height(cm)': 160,
-                                                                             'weight(kg)': 65, 'Gtp': 34,  'HDL': 55,
-                                                                             'serum creatinine': 0, 'systolic': 126,
+                                                                            'weight(kg)': 65, 'Gtp': 34, 'HDL': 55,
+                                                                            'serum creatinine': 0, 'systolic': 126,
                                                                             'ALT': 15,
-                                                                             'eyesight(left)': 1,'eyesight(right)': 0,
-                                                                             'hemoglobin': 13, 'smoking': 1})
+                                                                            'eyesight(left)': 1, 'eyesight(right)': 0,
+                                                                            'hemoglobin': 13, 'smoking': 1})
     print(woman, '\n')
     prRed("Test on a smoker male subject")
     man = data.query(show_progress=False, variables=['gender'], evidence={'age': 75, 'height(cm)': 160,
@@ -460,13 +463,12 @@ if __name__ == '__main__':
                                                                           'hemoglobin': 15, 'smoking': 1})
     print(man, '\n')
 
-
     # Potential non-smoker subject
     prGreen("Tests carried out on an average person with values:")
     print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\t-\tgender: 1 (woman)\n")
     notSmoker = data.query(show_progress=False, variables=['smoking'],
                            evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'gender': 1, 'hearing(left)': 0,
-                                     'hearing(right)': 0,  'triglyceride': 113, 'dental caries': 0, 'tartar': 0})
+                                     'hearing(right)': 0, 'triglyceride': 113, 'dental caries': 0, 'tartar': 0})
 
     prGreen('\nProbability for a potentially non-smoker:')
     print(notSmoker, '\n')
@@ -487,7 +489,6 @@ if __name__ == '__main__':
 
     prRed('\nProbability for a potential smoker:')
     print(smoker)
-
 
     # Test on subject potentially smoker
     TestSmoker = data.query(show_progress=False, variables=['smoking'],
@@ -510,7 +511,8 @@ if __name__ == '__main__':
                 exit(1)
             elif 'Y' == result or result == 'y':
                 prYellow("Please insert: ")
-                columns = ["age", "height(cm)", "weight(kg)", "gender", "hearing(left)", "hearing(right)", "triglyceride",
+                columns = ["age", "height(cm)", "weight(kg)", "gender", "hearing(left)", "hearing(right)",
+                           "triglyceride",
                            "dental caries", "tartar"]
                 print(columns)
                 prRed("Age - height(cm) - weight(kg) - gender are obligatory to enter!")
@@ -559,7 +561,8 @@ if __name__ == '__main__':
                             prRed("Error! Insert value (0 = No, 1 = Yes): ")
                         elif (columns[i] == "dental caries") and (value[i] > 1):
                             prRed("Error! Insert value (0 = No, 1 = Yes): ")
-                        elif (columns[i] == "hearing(left)" or columns[i] == "hearing(right)") and (value[i] > 2 or value[i] < 0):
+                        elif (columns[i] == "hearing(left)" or columns[i] == "hearing(right)") and (
+                                value[i] > 2 or value[i] < 0):
                             prRed("Error! Insert value in range 0 - 2")
                         else:
                             i = i + 1
