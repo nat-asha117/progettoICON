@@ -11,12 +11,14 @@
 \usepackage[italian]{babel}
 \geometry{a4paper, top=3cm, bottom=3cm, left=3cm, right=3cm}
 
-\title{Smoking study \\
-    \large Studio e analisi dei dati di soggetti fumatori e non}
+\title{\textbf{Smoking study} \\
+    \large Studio e analisi dei dati di soggetti fumatori e non}\\\\
 \author{Natasha Fabrizio - Matricola: 717446 \\
 Email: \textit{n.fabrizio@studenti.uniba.it} \\
-        Francesco Saverio Cassano - Matricola: 716133 \\
-        Email: \textit{f.cassano45@studenti.uniba.it} \\\\
+    Francesco Saverio Cassano - Matricola: 716133 \\
+Email: \textit{f.cassano45@studenti.uniba.it} \\\\
+Documentazione realizzata in: \textbf{LaTeX} \\
+Link repository GitHub: \textit{}\\\\
     Progetto di Ingegneria della Conoscenza}
     
 \date{2021-2022}
@@ -219,7 +221,7 @@ I modelli valutati sono:
     \end{itemize}
 \end{itemize}
 %
-Sui suddetti abbiamo eseguito  il \textbf{K-Fold Cross Validation}, per verificare quale di esse fosse il più attendibile. In particolare, il \textbf{RepeatedKFold}, con 5 ripetizioni.\\
+Sui suddetti abbiamo eseguito  il \textbf{K-Fold Cross Validation}, per verificare quale di esse fosse il più attendibile. In particolare, il \textbf{RepeatedKFold} con 5 ripetizioni, ottenendo così una media più accurata per le metriche.\\
 Inoltre, le metriche di performance utilizzate nella valutazione sono:
 \begin{itemize}
     \item accuratezza 
@@ -228,11 +230,11 @@ Inoltre, le metriche di performance utilizzate nella valutazione sono:
     \item F1-score
 \end{itemize}
 
-Segue che i risultati ottenuti dalla valutazione sono:
+Segue che i risultati medi ottenuti dalla valutazione sono:
 \begin{figure}[H]
         \includegraphics[width=0.9\textwidth]{imagModel}
         \centering
-        \caption{Performance classificatori (Eseguiti 5 ri-avvi con piccole differenze di 1-2\%)}
+        \caption{Performance classificatori}
         \centering
 \end{figure}
 
@@ -267,6 +269,16 @@ In particolare:
 \end{figure}
 %
 
+\begin{figure}[H]
+        \includegraphics[width=0.9\textwidth]{dev2}
+        \includegraphics[width=0.5\textwidth]{dev1}
+        \centering
+        \caption{Deviazione standard dei classificatori}
+        \centering
+\end{figure}
+%
+
+
 \noindent
 Basandoci su tali performance, in particolare su quella del \textbf{F1-score}, abbiamo riscontrato che il classificatore migliore risulta essere il Random Forest.
 
@@ -286,7 +298,12 @@ Possiamo notare che il genere, l'emoglobina e il gtp
 sono le caratteristiche mediche predittive più importanti per la diagnostica di un soggetto potenzialmente fumatore o meno.
 
 \subsection{Creazione della rete bayesiana}
-Abbiamo scelto di implementare una rete bayesiana per poter effettuare delle interrogazione per verficare le probabilità delle features; utilizzando come metodo di scoring il \textit{K2score} e come stimatore il \textit{MaximumLikeliHoodEstimato}. In questo modo la predizione avverrà in base alle nostre features.\\
+Abbiamo scelto di implementare una rete bayesiana per poter effettuare delle interrogazione per
+verificare le probabilità delle features, utilizzando come metodo di scoring il K2score.\\ 
+Le tabelle CPD vengono generate con il dataset "smoking.csv" e andando ad usare il
+MaximumLikeliHoodEstimator creiamo una rete bayesiana completa, con le probabilità apprese dal
+dataset. In questo modo la predizione avverrà in base alle nostre features.\\
+Dall'analisi delle rete è emerso che la feature \textit{oral} non ha nessun collegamento con gli altri nodi della rete. Mentre, le features \textit{Cholesterol} e \textit{LDL} hanno un collegamento tra loro ma sono scollegate dai restanti nodi della rete. Ragion per cui, si è optato per la loro eliminazione  e quindi, abbiamo effettuato una feature selection, in modo da poter ridurerre la complessità delle operazioni.
 %
 
 \begin{figure}[H]
@@ -410,8 +427,6 @@ Ottenendo come probabilità:
 \end{figure}
 %
 
-\noindent
-Da questi test è emerso che le features più rilevanti sono: gtp, triglyceride, hemoglobin e tartar
 \subsection{Interfaccia per l'interazione dell'utente con la knowledge base}
 
 \begin{figure}[H]
