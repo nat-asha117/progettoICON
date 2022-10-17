@@ -4,6 +4,7 @@
 
 # Main libraries
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 import pandas as pd
 import sys
@@ -17,7 +18,7 @@ from pgmpy.models import BayesianNetwork
 
 # Machine learning
 from sklearn import metrics
-from sklearn.model_selection import RepeatedKFold
+from sklearn.model_selection import RepeatedKFold, cross_val_score
 
 # Classification algorithms
 from sklearn.ensemble import RandomForestClassifier
@@ -36,23 +37,24 @@ def simulationThread(bNet, value, data, evemt):
     time.sleep(1)
     while True:
         newValue = bNet.simulate(show_progress=False, n_samples=1,
-                                 evidence={'smoking': 0, 'age': value[0],
-                                           'height(cm)': value[1],
-                                           'weight(kg)': value[2]})
-        newValue = newValue.drop(["Cholesterol", "smoking", "LDL", "systolic", "relaxation"], axis=1)
+                                 evidence={'smoking': 0, 'age': value[0], 'height(cm)': value[1],
+                                           'weight(kg)': value[2], 'gender': value[3]})
         UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
                                       evidence={'age': newValue.get("age")[0],
                                                 'height(cm)': newValue.get("height(cm)")[0],
                                                 'weight(kg)': newValue.get("weight(kg)")[0],
-                                                'Gtp': newValue.get("Gtp")[0],
+                                                'gender': newValue.get("gender")[0],
+                                                'hearing(left)': newValue.get("hearing(left)")[0],
+                                                'hearing(right)': newValue.get("hearing(right)")[0],
                                                 'triglyceride': newValue.get("triglyceride")[0],
-                                                'HDL': newValue.get("HDL")[0],
-                                                'hemoglobin': newValue.get("hemoglobin")[0],
-                                                'serum creatinine': newValue.get("serum creatinine")[0],
                                                 "dental caries": newValue.get("dental caries")[0],
-                                                'tartar': newValue.get("tartar")[0]})
+                                                'tartar': newValue.get("tartar")[0],
+                                                })
         if UserInputUpdated.values[0] > 0.50:
             time.sleep(1)
+            newValue = newValue.drop(
+                ["ALT", "waist(cm)", "Gtp", "serum creatinine", "eyesight(right)", "eyesight(left)",
+                 "Cholesterol", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
             prYellow("Suggested values:")
             print(newValue)
             prYellow("New probability based on suggested values")
@@ -70,7 +72,7 @@ def prRedMoreString(prt, prt2, prt3):
 
 
 def prYellowMoreString(prt, prt2, prt3):
-    print("\033[91m{}\033[00m".format(prt),"\033[91m{}\033[00m".format(prt2),"\033[91m{}\033[00m".format(prt3))
+    print("\033[91m{}\033[00m".format(prt), "\033[91m{}\033[00m".format(prt2), "\033[91m{}\033[00m".format(prt3))
 
 
 def prGreenMoreString(prt, prt2, prt3):
@@ -93,24 +95,29 @@ def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
 
 
+def printProbability(data, var):
+    print(var, "probability:", data.values[1], "\n")
+
+
 if __name__ == '__main__':
     # Import of the dataset
     if len(sys.argv) > 1:
         df = pd.read_csv(sys.argv[1])
     else:
-        df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
-
-
+        df = pd.read_csv("C:\\Users\\verio\\repo\\progettoICON\\pythonProject\\smoking.csv")
 
     # DATASET OPTIMIZATION:
 
     # Deleting unused and/or irrelevant columns
-    df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral",
-                        "waist(cm)"], axis=1)
+    df_smoke = df.drop(["ID"], axis=1)
 
     # String to full conversion + dataframe cleaning
     df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
     df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
+    df_smoke["oral"] = df_smoke["oral"].replace("N", 0)
+    df_smoke["oral"] = df_smoke["oral"].replace("Y", 1)
+    df_smoke["gender"] = df_smoke["gender"].replace("M", 0)
+    df_smoke["gender"] = df_smoke["gender"].replace("F", 1)
 
     # Data overview
     print("\nDisplay (partial) of the dataframe:\n", df_smoke.head())
@@ -272,6 +279,7 @@ if __name__ == '__main__':
         model['GaussianNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_gnb))
         model['GaussianNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_gnb))
 
+
         # report template
         def model_report(model):
 
@@ -286,7 +294,6 @@ if __name__ == '__main__':
                                                })
 
                 df_smoke_models.append(df_smoke_model)
-
             return df_smoke_models
 
     # Visualization of the table with metrics and Graph
@@ -326,6 +333,25 @@ if __name__ == '__main__':
     plt.title("F1score")
     plt.show()
 
+    # Standard deviation
+    std_knn = np.std(cross_val_score(knn, X_test, y_test, cv=5, n_jobs=5))
+    std_dtc = np.std(cross_val_score(dtc, X_test, y_test, cv=5, n_jobs=5))
+    std_rfc = np.std(cross_val_score(rfc, X_test, y_test, cv=5, n_jobs=5))
+    std_svc = np.std(cross_val_score(svc, X_test, y_test, cv=5, n_jobs=5))
+    std_bnd = np.std(cross_val_score(bnb, X_test, y_test, cv=5, n_jobs=5))
+    std_gnb = np.std(cross_val_score(gnb, X_test, y_test, cv=5, n_jobs=5))
+    plt.plot(["KNN", "DecisionTree", "RandomForest", "SVM", "BernoulliNB", "GaussianNB"],
+             [std_knn, std_dtc, std_rfc, std_svc, std_bnd, std_gnb])
+    plt.title("Standard deviation")
+    plt.ylabel("Standard deviation value")
+    plt.xlabel("Classifiers")
+    plt.show()
+    print("\nStandard deviation for Knn:", std_knn)
+    print("\nStandard deviation for DecisionTree:", std_dtc)
+    print("\nStandard deviation for RandomForest:", std_rfc)
+    print("\nStandard deviation for SVM:", std_svc)
+    print("\nStandard deviation for BernoulliNB:", std_bnd)
+    print("\nStandard deviation for GaussianNB:", std_gnb)
     # VERIFICATION OF THE IMPORTANCE OF FEATURES
 
     # Creation of X feature and target y
@@ -351,6 +377,9 @@ if __name__ == '__main__':
 
     prYellow("\n\t\tCreation of the Bayesian Network\n")
 
+    # Removing unnecessary features
+    df_smoke = df_smoke.drop(["oral", "Cholesterol", "LDL"], axis=1)
+
     # Converting all values within the dataframe to integers
     df_smoke_int = np.array(df_smoke, dtype=int)
     df_smoke = pd.DataFrame(df_smoke_int, columns=df_smoke.columns)
@@ -368,10 +397,28 @@ if __name__ == '__main__':
     bNet = BayesianNetwork(k2_model.edges())
     bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 
+    # Graph of nodes
+
+    G = nx.MultiDiGraph(k2_model.edges())
+    G.add_edges_from(bNet.edges())
+    pos = nx.spring_layout(G, iterations=100, k=2, threshold=5, pos=nx.spiral_layout(G))
+    nx.draw_networkx_nodes(G, pos, node_size=150, node_color="#ff574c")
+    nx.draw_networkx_labels(G, pos, font_size=10, font_weight="bold", clip_on=True, horizontalalignment="center",
+                            verticalalignment="bottom")
+    nx.draw_networkx_edges(G, pos, arrows=True, arrowsize=7, arrowstyle="->", edge_color="purple",
+                           connectionstyle="angle3,angleA=90,angleB=0", min_source_margin=1.2, min_target_margin=1.5,
+                           edge_vmin=2, edge_vmax=2)
+
+    plt.title("BAYESIAN NETWORK GRAPH")
+    plt.show()
+
     # Information about bNet
 
     prYellow("\nMarkov blanket for \"smoking\"")
     print(bNet.get_markov_blanket('smoking'), "\n")
+
+    prYellow("\nMarkov blanket for \"gender\"")
+    print(bNet.get_markov_blanket('gender'), "\n")
 
     # CALCULATION OF THE PROBABILITY
     #  calculation for a supposed non-smoker (0) and a smoker (1)
@@ -379,40 +426,74 @@ if __name__ == '__main__':
     # Elimination of irrelevant variables
     data = VariableElimination(bNet)  # inference
 
-    # Display of edges and arcs
-    print('\033[1m' + '\nNodes:\n' + '\033[0m', bNet.nodes)
-    print('\033[1m' + '\nEdges:\n' + '\033[0m', bNet.edges)
+    prGreen("Probability control of features that affect gender:")
+    prGreen("Test on a non-smoker female subject")
+    woman = data.query(show_progress=False, variables=['gender'], evidence={'age': 40, 'height(cm)': 160,
+                                                                            'weight(kg)': 65, 'Gtp': 34, 'HDL': 55,
+                                                                            'serum creatinine': 0, 'systolic': 126,
+                                                                            'ALT': 15, 'eyesight(left)': 1,
+                                                                            'eyesight(right)': 0, 'hemoglobin': 13,
+                                                                            'smoking': 0})
+    print(woman, '\n')
+    prGreen("Test on a non-smoker male subject")
+    man = data.query(show_progress=False, variables=['gender'], evidence={'age': 75, 'height(cm)': 160,
+                                                                          'weight(kg)': 70, 'Gtp': 17, 'HDL': 71,
+                                                                          'serum creatinine': 0, 'systolic': 128,
+                                                                          'ALT': 16,
+                                                                          'eyesight(left)': 0, 'eyesight(right)': 1,
+                                                                          'hemoglobin': 15, 'smoking': 0})
+    print(man, '\n')
+
+    # Smoker
+
+    prRed("Test on a smoker female subject")
+    woman = data.query(show_progress=False, variables=['gender'], evidence={'age': 40, 'height(cm)': 160,
+                                                                            'weight(kg)': 65, 'Gtp': 34, 'HDL': 55,
+                                                                            'serum creatinine': 0, 'systolic': 126,
+                                                                            'ALT': 15,
+                                                                            'eyesight(left)': 1, 'eyesight(right)': 0,
+                                                                            'hemoglobin': 13, 'smoking': 1})
+    print(woman, '\n')
+    prRed("Test on a smoker male subject")
+    man = data.query(show_progress=False, variables=['gender'], evidence={'age': 75, 'height(cm)': 160,
+                                                                          'weight(kg)': 70, 'Gtp': 17, 'HDL': 71,
+                                                                          'serum creatinine': 0, 'systolic': 128,
+                                                                          'ALT': 16,
+                                                                          'eyesight(left)': 0, 'eyesight(right)': 1,
+                                                                          'hemoglobin': 15, 'smoking': 1})
+    print(man, '\n')
 
     # Potential non-smoker subject
     prGreen("Tests carried out on an average person with values:")
-    print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
+    print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\t-\tgender: 1 (woman)\n")
     notSmoker = data.query(show_progress=False, variables=['smoking'],
-                           evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113,
-                                     'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 0})
+                           evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'gender': 1, 'hearing(left)': 0,
+                                     'hearing(right)': 0, 'triglyceride': 113, 'dental caries': 0, 'tartar': 0})
 
     prGreen('\nProbability for a potentially non-smoker:')
     print(notSmoker, '\n')
 
     # Test on Potentially non-smoker subject
     TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
-                               evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
-                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 1})
+                               evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'gender': 1,
+                                         'triglyceride': 148, 'hearing(left)': 1, 'hearing(right)': 1,
+                                         'dental caries': 1, 'tartar': 1})
 
     prGreen('\nTest on Potentially non-smoker subject:')
     print(TestNotSmoker, '\n')
 
     # Potential smoker
     smoker = data.query(show_progress=False, variables=['smoking'],
-                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'HDL': 50,
-                                  'hemoglobin': 18, 'serum creatinine': 5, 'dental caries': 1, 'tartar': 1})
+                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'gender': 1, 'triglyceride': 151,
+                                  'hearing(left)': 1, 'hearing(right)': 1, 'dental caries': 1, 'tartar': 1})
 
     prRed('\nProbability for a potential smoker:')
     print(smoker)
 
     # Test on subject potentially smoker
     TestSmoker = data.query(show_progress=False, variables=['smoking'],
-                            evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 18, 'triglyceride': 151,
-                                      'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 0, 'dental caries': 1, 'tartar': 1})
+                            evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'gender': 1, 'triglyceride': 120,
+                                      'hearing(left)': 1, 'hearing(right)': 1, 'dental caries': 0, 'tartar': 0})
 
     prRed('\nTest on Subject potentially smoker:')
     print(TestSmoker, '\n')
@@ -430,19 +511,24 @@ if __name__ == '__main__':
                 exit(1)
             elif 'Y' == result or result == 'y':
                 prYellow("Please insert: ")
-                columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "HDL",
-                           "hemoglobin", "serum creatinine", "dental caries", "tartar"]
+                columns = ["age", "height(cm)", "weight(kg)", "gender", "hearing(left)", "hearing(right)",
+                           "triglyceride",
+                           "dental caries", "tartar"]
                 print(columns)
-                prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
+                prRed("Age - height(cm) - weight(kg) - gender are obligatory to enter!")
                 value = [None] * len(columns)
                 while i < len(columns):
                     if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
                         prRed("The range of allowed values are multiples of 5")
-                        print("The minimum acceptable \"", columns[i], "\"value is:", df_smoke[columns[i]].min(),
+                        print("The minimum acceptable \"", columns[i], "\" value is:", df_smoke[columns[i]].min(),
                               "The maximum is:", df_smoke[columns[i]].max())
                         print("Insert ", columns[i], " value: ")
-                    elif columns[i] != "tartar" and columns[i] != "dental caries":
+                    elif columns[i] != "tartar" and columns[i] != "dental caries" and columns[i] != "gender":
                         print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
+                    elif columns[i] == "gender":
+                        print("Insert ", columns[i], " value (0 = Man, 1 = Woman)")
+                    elif (columns[i] == "hearing(left)") or (columns[i] == "hearing(right)"):
+                        print("Insert ", columns[i], " value (Acceptable values range from 0 to 2)")
                     else:
                         print("Insert ", columns[i], " value (0 = No, 1 = Yes, -1 = Data not available): ")
                     value[i] = int(input())
@@ -457,8 +543,17 @@ if __name__ == '__main__':
                             prRed("Error! You have not entered a multiple of 5")
                         else:
                             i = i + 1
+                    elif columns[i] == "gender":
+                        if value[i] < 0:
+                            prRed("Insert value >= 0")
+                        elif value[i] < df_smoke[columns[i]].min():
+                            prRed("Error! You entered too small value!")
+                        elif value[i] > df_smoke[columns[i]].max():
+                            prRed("Error! You entered too large value!")
+                        else:
+                            i = i + 1
                     else:
-                        if value[i] == -1 and ():
+                        if value[i] == -1:
                             prRed("Insert value >= 0")
                         elif value[i] <= -2:
                             prRed("Insert value >= 0")
@@ -466,6 +561,9 @@ if __name__ == '__main__':
                             prRed("Error! Insert value (0 = No, 1 = Yes): ")
                         elif (columns[i] == "dental caries") and (value[i] > 1):
                             prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                        elif (columns[i] == "hearing(left)" or columns[i] == "hearing(right)") and (
+                                value[i] > 2 or value[i] < 0):
+                            prRed("Error! Insert value in range 0 - 2")
                         else:
                             i = i + 1
                 try:
