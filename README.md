@@ -12,11 +12,12 @@ La documentazione del progetto è presente nella cartella [doc](https://github.c
 ## Linguaggio utilizzato e dipendenze
 
 - Python >= 3.9
-- matplotlib>=3.5.3
-- numpy>=1.23.2
-- pandas>=1.4.4
-- pgmpy>=0.1.19
-- scikit_learn>=1.1.2
+- matplotlib >= 3.5.3
+- networkx >= 2.8.7
+- numpy >= 1.23.2
+- pandas >= 1.4.4
+- pgmpy >= 0.1.19
+- scikit_learn >= 1.1.2
 
 Nella cartella del progetto è presente il file _requirements.txt_ da poter utilizzare per installare le librerie utilizzate.
 
