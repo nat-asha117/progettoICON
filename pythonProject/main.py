@@ -169,7 +169,7 @@ if __name__ == '__main__':
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-    kf = RepeatedKFold(n_splits=5, n_repeats=5)
+    kf = RepeatedKFold(n_splits=5, n_repeats=1)
 
     # Classifiers for the purpose of evaluation
     knn = KNeighborsClassifier()
@@ -425,6 +425,15 @@ if __name__ == '__main__':
 
     # Elimination of irrelevant variables
     data = VariableElimination(bNet)  # inference
+
+    prYellow("The probability results are so structured:")
+    print(" +-------------------+---------------------------+\n",
+           "|   feature name    |    feature probability    |\n",
+           "+===================+===========================+\n",
+           "| feature name(val) | probability feature (val) |\n",
+           "+-------------------+---------------------------+\n",
+           "| feature name(val) | probability feature (val) |\n",
+           "+-------------------+---------------------------+\n")
 
     prGreen("Probability control of features that affect gender:")
     prGreen("Test on a non-smoker female subject")
