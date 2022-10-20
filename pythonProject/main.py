@@ -104,7 +104,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         df = pd.read_csv(sys.argv[1])
     else:
-        df = pd.read_csv("C:\\Users\\verio\\repo\\progettoICON\\pythonProject\\smoking.csv")
+        df = pd.read_csv("C:\\Users\\natax\\progettoICON\\pythonProject\\smoking.csv")
 
     # DATASET OPTIMIZATION:
 
@@ -421,19 +421,18 @@ if __name__ == '__main__':
     print(bNet.get_markov_blanket('gender'), "\n")
 
     # CALCULATION OF THE PROBABILITY
-    #  calculation for a supposed non-smoker (0) and a smoker (1)
 
     # Elimination of irrelevant variables
     data = VariableElimination(bNet)  # inference
 
-    prYellow("The probability results are so structured:")
-    print(" +-------------------+---------------------------+\n",
-           "|   feature name    |    feature probability    |\n",
-           "+===================+===========================+\n",
-           "| feature name(val) | probability feature (val) |\n",
-           "+-------------------+---------------------------+\n",
-           "| feature name(val) | probability feature (val) |\n",
-           "+-------------------+---------------------------+\n")
+    prYellow("Probability results for gender are so structured:")
+    print(" +----------------------+---------------------------+\n",
+           "|    feature name      |    feature probability    |\n",
+           "+======================+===========================+\n",
+           "|  feature name(male)  | probability feature (val) |\n",
+           "+----------------------+---------------------------+\n",
+           "| feature name(female) | probability feature (val) |\n",
+           "+----------------------+---------------------------+\n")
 
     prGreen("Probability control of features that affect gender:")
     prGreen("Test on a non-smoker female subject")
@@ -471,6 +470,15 @@ if __name__ == '__main__':
                                                                           'eyesight(left)': 0, 'eyesight(right)': 1,
                                                                           'hemoglobin': 15, 'smoking': 1})
     print(man, '\n')
+
+    prYellow("Probability results for smoking are so structured:")
+    print(" +--------------------------+---------------------------+\n",
+          "|      feature name         |    feature probability    |\n",
+          "+===========================+===========================+\n",
+          "|  feature name(not-smoker) | probability feature (val) |\n",
+          "+---------------------------+---------------------------+\n",
+          "|  feature name(smoker)     | probability feature (val) |\n",
+          "+---------------------------+---------------------------+\n")
 
     # Potential non-smoker subject
     prGreen("Tests carried out on an average person with values:")
