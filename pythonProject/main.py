@@ -169,7 +169,7 @@ if __name__ == '__main__':
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-    kf = RepeatedKFold(n_splits=5, n_repeats=1)
+    kf = RepeatedKFold(n_splits=5, n_repeats=5)
 
     # Classifiers for the purpose of evaluation
     knn = KNeighborsClassifier()
@@ -432,7 +432,8 @@ if __name__ == '__main__':
            "|  feature name(male)  | probability feature (val) |\n",
            "+----------------------+---------------------------+\n",
            "| feature name(female) | probability feature (val) |\n",
-           "+----------------------+---------------------------+\n")
+           "+----------------------+---------------------------+")
+    prPurple("Probability value fluctuates between 0 (impossible event) to 1 (certain event)\n")
 
     prGreen("Probability control of features that affect gender:")
     prGreen("Test on a non-smoker female subject")
@@ -478,7 +479,8 @@ if __name__ == '__main__':
           "|  feature name(not-smoker) | probability feature (val) |\n",
           "+---------------------------+---------------------------+\n",
           "|  feature name(smoker)     | probability feature (val) |\n",
-          "+---------------------------+---------------------------+\n")
+          "+---------------------------+---------------------------+")
+    prPurple("Probability value fluctuates between 0 (impossible event) to 1 (certain event)\n")
 
     # Potential non-smoker subject
     prGreen("Tests carried out on an average person with values:")
