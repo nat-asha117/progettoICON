@@ -18,7 +18,7 @@ Email: \textit{n.fabrizio@studenti.uniba.it} \\
     Francesco Saverio Cassano - Matricola: 716133 \\
 Email: \textit{f.cassano45@studenti.uniba.it} \\\\
 Documentazione realizzata in: \textbf{LaTeX} \\
-Link repository GitHub: \textit{https://github.com/nat-asha117/progettoICON}\\\\
+Link repository GitHub:\\ \hrefs{https://github.com/nat-asha117/progettoICON} \\\\
     Progetto di Ingegneria della Conoscenza}
     
 \date{2021-2022}
@@ -333,7 +333,17 @@ Le Markov blanket di \textit{gender}, quindi, sono:
         \centering
 \end{figure}
 
-Tenendo in considerazione le Markov blanket di \textit{gender}, abbiamo effettuato interrogazioni sulla rete con un soggetto femminile ed uno maschile non fumatori. 
+\noindent
+Tenendo in considerazione le Markov blanket di \textit{gender}, abbiamo effettuato interrogazioni sulla rete con un soggetto femminile ed uno maschile non fumatori. \\
+
+\noindent
+Schema delle probabilità, per la feature \textit{gender}, che seguiranno:
+\begin{figure}[H]
+        \includegraphics[width=10.6cm]{schema1}
+        \centering
+        \caption{Struttura dei risultati delle probabilità}
+        \centering
+\end{figure}
 
 \begin{figure}[H]
         \includegraphics[width=10.6cm]{notSmokeGen}
@@ -343,7 +353,7 @@ Tenendo in considerazione le Markov blanket di \textit{gender}, abbiamo effettua
 \end{figure}
 
 \noindent
-N.B.\\Anche se i risultati delle probabilità, sono indicati con phi, tutte le probabilità calcolate sono probabilità condizionate.\\
+N.B. Anche se i risultati delle probabilità, sono indicati con phi, tutte le probabilità calcolate sono probabilità condizionate.\\
 
 Per ottenere tali dati, abbiamo effettuato le seguenti query:
 \begin{enumerate}
@@ -359,6 +369,7 @@ Per ottenere tali dati, abbiamo effettuato le seguenti query:
 \end{figure}
 %
 
+\noindent
 Abbiamo effettuato le query sopra indicate, considerando i soggetti, questa volta, come fumatori.
 Ottenendo come risultati:
 
@@ -381,8 +392,18 @@ Le Markov Blanket di \textit{smoking}, invece, sono:
         \centering
 \end{figure}
 
-%
-Sfruttando la rete bayesiana, calcoliamo la probabilità per un soggetto presumibilmente non fumatore (0) ed uno fumatore (1) di esserlo o meno. Il soggetto di genere femminile preso in analisi ha età, altezza e peso standard, ovvero età: 20, altezza: 170, peso: 60.
+\noindent
+Sfruttando la rete bayesiana, calcoliamo la probabilità per un soggetto presumibilmente non fumatore (0) ed uno fumatore (1) di esserlo o meno. Il soggetto di genere femminile preso in analisi ha età, altezza e peso standard, ovvero età: 20, altezza: 170, peso: 60.\\
+
+\noindent
+Schema delle probabilità, per la feature \textit{smoking}, che seguiranno:
+\begin{figure}[H]
+        \includegraphics[width=10.6cm]{schema2}
+        \centering
+        \caption{Struttura dei risultati delle probabilità}
+        \centering
+\end{figure}
+
 
 \begin{figure}[H]
         \includegraphics[width=10.6cm]{probNotSmoke}
