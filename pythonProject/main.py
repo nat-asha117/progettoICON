@@ -10,6 +10,8 @@ import pandas as pd
 import sys
 import time
 import multiprocessing
+import itertools
+import threading
 
 # Classification models
 from pgmpy.estimators import K2Score, HillClimbSearch, MaximumLikelihoodEstimator
@@ -54,7 +56,7 @@ def simulationThread(bNet, value, data, evemt):
             time.sleep(1)
             newValue = newValue.drop(
                 ["ALT", "waist(cm)", "Gtp", "serum creatinine", "eyesight(right)", "eyesight(left)",
-                 "Cholesterol", "LDL", "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
+                "systolic", "relaxation", "HDL", "hemoglobin"], axis=1)
             prYellow("Suggested values:")
             print(newValue)
             prYellow("New probability based on suggested values")
@@ -95,16 +97,31 @@ def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
 
 
+def animate():
+    for c in itertools.cycle(['|', '/', '-', '\\']):
+        if done:
+            break
+        sys.stdout.write('\rloading ' + c)
+        sys.stdout.flush()
+        time.sleep(0.1)
+    sys.stdout.write('\rLoading done!     ')
+
+
+
 def printProbability(data, var):
     print(var, "probability:", data.values[1], "\n")
 
 
 if __name__ == '__main__':
+    done = False
+    t = threading.Thread(target=animate)
+    t.start()
+    time.sleep(0.1)
     # Import of the dataset
     if len(sys.argv) > 1:
         df = pd.read_csv(sys.argv[1])
     else:
-        df = pd.read_csv("C:\\Users\\natax\\progettoICON\\pythonProject\\smoking.csv")
+        df = pd.read_csv("smoking.csv")
 
     # DATASET OPTIMIZATION:
 
@@ -119,6 +136,8 @@ if __name__ == '__main__':
     df_smoke["gender"] = df_smoke["gender"].replace("M", 0)
     df_smoke["gender"] = df_smoke["gender"].replace("F", 1)
 
+    done = True
+    time.sleep(1)
     # Data overview
     print("\nDisplay (partial) of the dataframe:\n", df_smoke.head())
     print("\nNumber of elements: ", len(df_smoke.index) - 1)
@@ -162,6 +181,11 @@ if __name__ == '__main__':
     plt.title("Graph of occurrence of smokers and non-smokers\n\nafter Oversampling")
     plt.legend(labels=labels, loc="best")
     plt.show()
+
+    done = False
+    t = threading.Thread(target=animate)
+    t.start()
+    time.sleep(0.1)
 
     # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
 
@@ -296,6 +320,8 @@ if __name__ == '__main__':
                 df_smoke_models.append(df_smoke_model)
             return df_smoke_models
 
+    done = True
+    time.sleep(1)
     # Visualization of the table with metrics and Graph
     df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # concatenation of the models
     df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # removal of the index
