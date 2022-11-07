@@ -39,7 +39,7 @@ Il sistema è in grado di prevedere se un soggetto è potenzialmente un fumatore
 %
 
 \noindent
-Inoltre, l'utilizzatore del programma potrà inserire dei valori, (non necessariamente tutti) inerenti alle analisi, per poter comprendere se risulta un soggetto potenzialmente fumatore o meno; in caso affermativo, potrà ulteriormente decidere se ricevere o meno, un suggerimento su quali valori migliorare per non risultare più un fumatore.
+Inoltre, l'utilizzatore del programma potrà inserire dei valori (non necessariamente tutti), inerenti alle analisi, per poter comprendere se risulta un soggetto potenzialmente fumatore o meno. In caso affermativo, potrà ulteriormente decidere se ricevere o meno, un suggerimento su quali valori migliorare per non risultare più un fumatore.
 
 \section{Requisiti funzionali}
 
@@ -53,7 +53,7 @@ Le librerie Python utilizzate nel progetto, sono le seguenti:
     \item \textbf{Pandas}: usata per l’importazione del  Dataset in formato ".csv".
     \item \textbf{Pgmpy}: usata per la creazione della rete bayesiana..
     \item\textbf{Scikit-learn}: usata per applicare i concetti del Machine Learning.
-    \item \textbf{Warnings}: usata per la gestione dei messaggi  di warnings del sistema.
+    \item \textbf{NetworkX}: usata per la creazione grafica di grafici e reti.
 \end{itemize} 
 
 \subsection{Installazione e avvio}
@@ -73,7 +73,7 @@ Eventualmente, è possibile modificare il percorso di lettura del file .csv dal 
 \begin{figure}[H]
         \includegraphics [width=0.8 cm + \textwidth]{modify}
         \centering
-        \caption{Modifica del percorso di lettura del file csv a riga 107}
+        \caption{Eventuale modifica del percorso di lettura del file csv a riga 124}
         \centering
 \end{figure}
 
@@ -151,7 +151,7 @@ Mediante la stampa di una tabella, viene mostrato a schermo una panoramica inere
 \end{figure}
 
 \subsection{Bilanciamento delle classi}
-Attraverso un grafico, verifichiamo se il dataset sia ben bilanciato, in modo da riuscire ad avere ottimi risultati durante l'apprendimento.
+Attraverso un grafico, verifichiamo se il dataset sia ben bilanciato(in funzione di \textit{"smoking"} in modo da riuscire ad avere ottimi risultati durante l'apprendimento.
 
 \begin{figure}[H]
         \includegraphics[width=7.5cm]{grafico1}
@@ -221,7 +221,7 @@ I modelli valutati sono:
     \end{itemize}
 \end{itemize}
 %
-Sui suddetti abbiamo eseguito  il \textbf{K-Fold Cross Validation}, per verificare quale di esse fosse il più attendibile. In particolare, il \textbf{RepeatedKFold} con 5 ripetizioni, ottenendo così una media più accurata per le metriche.\\
+Sui suddetti abbiamo eseguito  il \textbf{K-Fold Cross Validation}, per verificare quale di essi fosse il più attendibile. In particolare, il \textbf{RepeatedKFold} con 5 ripetizioni, ottenendo così una media più accurata per le metriche.\\
 Inoltre, le metriche di performance utilizzate nella valutazione sono:
 \begin{itemize}
     \item accuratezza 
@@ -299,11 +299,11 @@ sono le caratteristiche mediche predittive più importanti per la diagnostica di
 
 \subsection{Creazione della rete bayesiana}
 Abbiamo scelto di implementare una rete bayesiana per poter effettuare delle interrogazione per
-verificare le probabilità delle features, utilizzando come metodo di scoring il K2score.\\ 
+verificare le probabilità delle features, utilizzando come metodo di scoring, il K2score.\\ 
 Le tabelle CPD vengono generate con il dataset "smoking.csv" e andando ad usare il
 MaximumLikeliHoodEstimator creiamo una rete bayesiana completa, con le probabilità apprese dal
 dataset. In questo modo la predizione avverrà in base alle nostre features.\\
-Dall'analisi delle rete è emerso che la feature \textit{oral} non ha nessun collegamento con gli altri nodi della rete. Mentre, le features \textit{Cholesterol} e \textit{LDL} hanno un collegamento tra loro ma sono scollegate dai restanti nodi della rete. Ragion per cui, si è optato per la loro eliminazione  e quindi, abbiamo effettuato una feature selection, in modo da poter ridurerre la complessità delle operazioni.
+Dall'analisi delle rete è emerso che la feature \textit{oral} non ha nessun collegamento con gli altri nodi della rete. Mentre, le features \textit{Cholesterol} e \textit{LDL} hanno un collegamento tra loro ma sono scollegate dai restanti nodi della rete. Ragion per cui, si è optato per la loro eliminazione  e quindi, abbiamo effettuato una feature selection, in modo da poter ridurre la complessità delle operazioni.
 %
 
 \begin{figure}[H]
@@ -482,7 +482,7 @@ Successivamente, viene visualizzata la probabilità risultante dai valori impost
 %
 
 \noindent
-Nel caso in cui la probabilità di essere un fumatore dovesse risultare superiore al 50\%, il sistema chiede all'utente se desidera riceve suggerimenti, ottenuti mediante una predizione, di valori ai quali ambire per poter risultare un non fumatore; tali valori sono ottenuti partendo dai valori di età, altezza, peso e genere.
+Nel caso in cui il sistema dovesse classificare l'utente come fumatore, e quindi con probabilità superiore al 50\%, il sistema chiederà all'utente se desidera riceve suggerimenti, ottenuti mediante una predizione, di valori ai quali ambire per poter risultare un non fumatore; tali valori sono ottenuti partendo dai valori di età, altezza, peso e genere.
 Se il sistema dovesse trovare una combinazione valida, ovvero con probabilità inferiore al 50\%, viene visualizzata come segue:
 
 \begin{figure}[H]
